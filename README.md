@@ -1,1 +1,36 @@
-# Firearm-Detection-System-Using-Image-Recognition-
+# Integrated Threat Detection System: Safeguarding Communities Through Advanced Surveillance and Analysis
+
+Overview
+This project aims to enhance public safety by developing an AI-powered system capable of detecting firearms in real-time through deep learning algorithms. The system identifies potential threats in crowded public spaces, such as schools and hospitals, enabling swift intervention and reducing risks.
+
+The solution uses advanced machine learning models for weapon detection, distinguishing between "Small Guns" and "Long Guns." This project is part of a larger effort to promote proactive risk management and crisis prevention using cutting-edge technology.
+
+Key Features
+Firearm Detection: Utilizes a convolutional neural network (CNN) for real-time image analysis to identify firearms.
+Deep Learning Algorithms: Built using Keras and trained on image datasets to classify weapons with high accuracy.
+Data Visualization: Performance metrics like accuracy and loss are plotted using ggplot2 for detailed training insights.
+Cloud Integration: Data is processed and analyzed on cloud platforms like AWS for scalable deployment.
+High Accuracy: The model achieved a training accuracy of 81% and is continuously improving with more training data.
+Libraries & Tools
+Keras: Deep learning framework for building and training the CNN model.
+EBImage: For image processing and manipulation.
+Tidyverse: For data manipulation and visualization.
+ggplot2: For visualizing model performance.
+AWS: Cloud platform for scalable data analysis.
+Python & R: Used for scripting and model training.
+Data
+The project uses a custom dataset collected from surveillance feeds, which is available for download here. The dataset includes labeled images of firearms for model training and evaluation.
+
+Installation & Usage
+Clone the repository and install the necessary libraries using the provided requirements.txt.
+Load the dataset and preprocess the images for training.
+Train the model using the provided scripts and evaluate its performance on the test set.
+Visualize model accuracy and loss over epochs using ggplot2.
+Project Results
+Training Accuracy: 81%
+Test Accuracy: 53.8%
+The model demonstrates robust performance, with clear visualizations of training loss and accuracy, along with predictions and image classifications.
+Future Work
+Expanding the dataset for improved accuracy.
+Integration with real-time surveillance systems for faster response times.
+Implementing additional object detection methods for broader threat detection.
