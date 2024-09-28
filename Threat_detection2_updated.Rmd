@@ -1,0 +1,281 @@
+---
+title: "Integrated Threat Detection System: Safeguarding Communities Through Advanced Surveillance and Analysis"
+output: html_document
+date: "2024-04-21"
+---
+
+## TEAM MEMBERS:
+
+###### Kirti Shahi
+
+###### Ranjitha Muniramaiah
+
+###### Venkata Naga Bhargavi Puvvadi
+
+###### Akash Baidya
+
+###### Sindhuja Amudalapadu
+
+
+## Problem Description
+
+The urgent demand for a reliable firearm detection system arises from the escalating concerns surrounding public safety, particularly in settings where large numbers of people gather, such as schools, hospitals, and densely populated public areas. Instances of violence involving firearms have underscored the critical necessity for effective detection methods to mitigate risks and safeguard individuals.
+
+This issue presents an intriguing challenge due to the opportunity it offers to leverage cutting-edge technology, notably deep learning algorithms, to bolster public safety measures. Deep learning, a subset of artificial intelligence, holds immense potential in analyzing complex data patterns, making it well-suited for firearm detection tasks. By harnessing the capabilities of deep learning, we can develop systems that can accurately identify firearms in real-time, enabling swift responses to potential threats.
+
+Furthermore, the development of weapon detection systems not only addresses the immediate need for enhanced security but also reflects a broader commitment to proactive risk management and crisis prevention. By efficiently identifying individuals carrying dangerous weapons, these systems empower security personnel to intervene before incidents escalate, thereby reducing the likelihood of harm and promoting a safer environment for all.
+
+## URL link to download the zip file of data you collected from the API
+
+https://www.dropbox.com/scl/fo/88cvkx0r6g4fw00jmoyeb/AHHwptePNylRmCP0VKGoCj8?rlkey=droin1yhhu9j0o495jxmvpy48&e=1&st=6w4v4uh8&dl=0
+
+
+### Required Libraries
+```{r}
+library(EBImage)
+library(keras)
+library(tidyverse)
+
+```
+
+## Loading a Keras Model from an HDF5 File in R and Accessing Training History
+
+```{r}
+model <- load_model_hdf5("model.h5")
+
+history 
+```
+
+## Reading Training History Data from an RDS File in R
+```{r}
+history <- read_rds("history.rds")
+```
+
+## Reading Class Labels from an RDS File in R
+
+```{r}
+class_labels <- read_rds("class_labels.rds")
+```
+
+
+## Reading Image Data from RDS Files in R
+
+```{r}
+myimages <- read_rds("myimages.rds")
+aimages <- read_rds("aimages.rds")
+```
+
+
+## Creating Training and Test Data Sets with Labels in R
+
+```{r}
+trainx <- NULL
+testx <- NULL
+
+for (i in 1:60) {trainx <- rbind(trainx,myimages[[i]])}
+for (i in 69:114) {trainx <- rbind(trainx,myimages[[i]])}
+
+
+for (i in 61:68) {testx <- rbind(testx,myimages[[i]])}
+for (i in 115:119) {testx <- rbind(testx,myimages[[i]])}
+trainy <- NULL
+testy <- NULL
+
+for (i in 1:60) {trainy <- rbind(trainy,class_labels[[i]])}
+for (i in 69:114) {trainy <- rbind(trainy,class_labels[[i]])}
+
+
+for (i in 61:68) {testy <- rbind(testy,class_labels[[i]])}
+for (i in 115:119) {testy <- rbind(testy,class_labels[[i]])}
+
+trainLabels <- to_categorical(trainy)
+testLables <- to_categorical(testy)
+```
+
+## Creating a Data Frame for Training and Validation Metrics in R using ggplot2
+
+```{r}
+library(ggplot2)
+
+# Create a data frame for training and validation metrics
+history_df <- data.frame(
+  epoch = 1:length(history$metrics$loss),
+  loss = history$metrics$loss,
+  val_loss = history$metrics$val_loss,
+  accuracy = history$metrics$accuracy,
+  val_accuracy = history$metrics$val_accuracy
+)
+```
+This data frame will be used for visualization purposes, likely to plot the training and validation metrics (loss and accuracy) over the epochs using ggplot2. It allows for easy visualization and comparison of the model's performance during training.
+
+
+## Plotting Training and Validation Loss with ggplot2 in R
+
+```{r}
+# Melt the data frame for easier plotting
+library(reshape2)
+history_df <- melt(history_df, id.vars = "epoch")
+
+# Plot loss
+loss_plot <- ggplot(history_df, aes(x = epoch, y = value, color = variable)) +
+  geom_line() +
+  labs(title = "Training and Validation Loss",
+       x = "Epochs",
+       y = "Loss") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+The above code block focuses on visualizing the training and validation loss over the epochs, allowing for a visual assessment of how the loss changes during the training process.
+
+## Plotting Training and Validation Accuracy with ggplot2 in R
+
+```{r}
+# Plot accuracy
+accuracy_plot <- ggplot(history_df, aes(x = epoch, y = value, color = variable)) +
+  geom_line() +
+  labs(title = "Training and Validation Accuracy",
+       x = "Epochs",
+       y = "Accuracy") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Display the plots
+loss_plot
+accuracy_plot
+
+plot(history)
+```
+The above code block generates and displays two plots: one for training and validation loss and another for training and validation accuracy, allowing for visual assessment of these metrics over the epochs of training.
+
+## Evaluating Model Performance on Training Data and Making Predictions
+
+```{r}
+model %>% evaluate(trainx,trainLabels)
+
+# Assuming your model is named 'model'
+# Predict probabilities for each class
+pred_prob <- model %>% predict(trainx)
+
+# Threshold the predicted probabilities
+threshold <- 0.5
+tpredictions <- ifelse(pred_prob[, 2] > threshold, 1, 0)
+
+# Print the predictions
+print(tpredictions)
+
+```
+The code evaluates the model's performance on the training data and makes predictions on the same data, providing insights into how well the model performs and what classes it predicts for each sample.
+```{r}
+table(Predicted = tpredictions,Actual = trainy)
+model %>% evaluate(testx,testLables)
+```
+The table above reveals a presence of a few false negatives and highlights an accuracy of 0.8462 with a loss of 0.3780, as demonstrated by the model evaluation.
+
+## Making Predictions on Test Data using a Trained Model
+
+```{r}
+pred_prob <- model %>% predict(testx)
+
+# Threshold the predicted probabilities
+threshold <- 0.5
+predictions <- ifelse(pred_prob[, 2] > threshold, 1, 0)
+
+# Print the predictions
+print(predictions)
+```
+The vector above represents binary predictions for the test data points. These predictions are derived by comparing the probability of belonging to the positive class (class 1) against a threshold of 0.5. When the probability of the positive class exceeds 0.5, the prediction is set to 1; otherwise, it is set to 0.
+
+## Combining Predicted Probabilities, Predictions, and Actual Labels for Test Data
+
+```{r}
+# Define the index column sequence
+index_sequence <- c(61:68, 115:119)
+
+# Repeat the index sequence to match the desired number of rows
+num_rows <- 13  # Change this to the desired number of rows
+index_column <- rep(index_sequence, length.out = num_rows)
+# Combine the predicted probabilities, predictions, actual labels, and index column
+
+result <- cbind(index = index_column, pred_prob, Predit = predictions, Actual = testy)
+result
+```
+The code provided establishes an index column sequence containing the predefined range of numbers. It then repeats this sequence to match the desired number of rows, creating an index column. This index column is intended for use in combining data, facilitating easy tracking and referencing of specific observations within the dataset.
+
+```{r}
+display(aimages[[115]])
+```
+Below is the image corresponding to the dataset.
+
+## "Identifying Mismatches between Predictions and Actual Labels"
+
+```{r}
+# Define labels
+labels <- c("Small Gun", "Long Gun")
+matching_indices <- which(predictions == testy)
+
+matching_indices
+
+labels <- c("Small Gun", "Long Gun")
+matching_indices1 <- which(predictions != testy)
+
+matching_indices1
+result <-result[matching_indices, "index"]
+```
+
+The above code segment establishes two classes of labels: 'Small Gun' and 'Long Gun'. It then identifies the indices where the predicted labels match the actual labels, stored in the variable 'matching_indices'. Conversely, the variable 'matching_indices1' captures indices where the predicted labels do not align with the actual labels.
+
+
+## Displaying Images with Matching Predictions and Actual Labels
+```{r}
+# Display images where predictions match actual labels along with their labels and corresponding index values
+for (i in matching_indices) {
+  # Get the corresponding index value
+  index_value <- result[i, "index"]
+  
+  # Plot the image
+  plot(aimages[[index_value]])
+  
+  # Get the actual and predicted labels
+  actual_label <- labels[testy[i] + 1]  # +1 to index labels properly
+  predicted_label <- labels[predictions[i] + 1]  # +1 to index labels properly
+  
+  # Add title with actual and predicted labels along with the index value
+  title(paste("Image", i, "(Index:", index_value, "): Actual =", actual_label, ", Predicted =", predicted_label))
+}
+```
+
+```{r}
+# Display images where predictions match actual labels along with their labels and corresponding index values
+for (i in matching_indices1) {
+  # Get the corresponding index value
+  index_value <- result[i, "index"]
+  
+  # Plot the image
+  plot(aimages[[index_value]])
+  
+  # Get the actual and predicted labels
+  actual_label <- labels[testy[i] + 1]  # +1 to index labels properly
+  predicted_label <- labels[predictions[i] + 1]  # +1 to index labels properly
+  
+  # Add title with actual and predicted labels along with the index value
+  title(paste("Image", i, "(Index:", index_value, "): Actual =", actual_label, ", Predicted =", predicted_label))
+}
+```
+The above code displays images along with their respective indices, while also indicating the actual and predicted labels.
+
+
+## Conclusion
+
+1. The integrated threat detection system presented in this document leverages advanced surveillance and analysis techniques to enhance public safety, particularly in environments prone to firearm-related incidents. By harnessing deep learning algorithms and modern technology, the system aims to accurately detect firearms in real-time, enabling proactive measures to prevent potential threats.
+
+2. Through the combination of data analysis and robust model training, the system demonstrates promising results in identifying firearms and distinguishing them from non-threatening objects. However, as indicated by the evaluation and prediction processes, there may be instances where the model's predictions do not align perfectly with the actual labels.
+
+3. These discrepancies underscore the importance of continued refinement and optimization of the system. By iteratively fine-tuning the model, expanding the training dataset, and enhancing the feature extraction process, the system can achieve higher accuracy and reliability in firearm detection.
+
+4. Overall, the integrated threat detection system represents a significant step forward in bolstering public safety measures, showcasing the potential of technology-driven solutions to address contemporary security challenges. Continued research and development in this area hold the promise of further improving the effectiveness and efficiency of firearm detection systems, ultimately contributing to safer and more secure communities.
+
+
+
+
+
+
